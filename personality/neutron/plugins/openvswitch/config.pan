@@ -15,11 +15,10 @@ include { 'components/chkconfig/config' };
 
 "/software/components/chkconfig/service/openvswitch/on" = ""; 
 "/software/components/chkconfig/service/openvswitch/startstop" = true;
-"/software/components/chkconfig/service/neutron-ovs-cleanup/on" = "";
 
 # create link
-variable OPENVSWITCH_PLUGIN_CONFIG ?= '/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini';
-variable OPENVSWITCH_PLUGIN_CONFIG_CONTENTS ?= file_contents('personality/neutron/plugins/openvswitch/ovs_neutron_plugin.templ');
+variable OPENVSWITCH_PLUGIN_CONFIG ?= '/etc/neutron/plugins/ml2/openvswitch_agent.ini';
+variable OPENVSWITCH_PLUGIN_CONFIG_CONTENTS ?= file_contents('personality/neutron/plugins/openvswitch/openvswitch_agent.templ');
 variable OPENVSWITCH_PLUGIN_CONFIG_CONTENTS=replace('TENANT_NETWORK_TYPE',TENANT_NETWORK_TYPE,OPENVSWITCH_PLUGIN_CONFIG_CONTENTS);
 variable OPENVSWITCH_PLUGIN_CONFIG_CONTENTS=replace('BRIDGE_MAPPINGS',BRIDGE_MAPPINGS,OPENVSWITCH_PLUGIN_CONFIG_CONTENTS);
 variable OPENVSWITCH_PLUGIN_CONFIG_CONTENTS=replace('NETWORK_VLAN_RANGES',NETWORK_VLAN_RANGES,OPENVSWITCH_PLUGIN_CONFIG_CONTENTS);

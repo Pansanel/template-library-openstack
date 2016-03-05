@@ -1,7 +1,7 @@
 template personality/nova/controller/config; 
 
 variable NOVA_EMAIL ?= SITE_EMAIL;
-variable NOVA_SERVICES ?= list('openstack-nova-api','openstack-nova-cert','openstack-consoleauth','openstack-nova-scheduler','openstack-nova-conductor','openstack-nova-novncproxy');
+variable NOVA_SERVICES ?= list('openstack-nova-api','openstack-nova-cert','openstack-nova-consoleauth','openstack-nova-scheduler','openstack-nova-conductor','openstack-nova-novncproxy');
 variable VNCSERVER_LISTEN ?= DB_IP[escape(FULL_HOSTNAME)];
 
 # include configuration common to client and server
@@ -15,7 +15,7 @@ variable NOVA_MYSQL_ADMINPWD ?= error('NOVA_MYSQL_ADMINPWD required but not spec
 # MySQL configuration
 #------------------------------------------------------------------------------
 
-include { 'components/mysql/config' };
+include { 'features/mariadb/config' };
 
 '/software/components/mysql/servers/' = {
     SELF[NOVA_MYSQL_SERVER]['adminuser'] = NOVA_MYSQL_ADMINUSER;
@@ -24,9 +24,10 @@ include { 'components/mysql/config' };
 };
 
 '/software/components/mysql/databases/' = {
-    SELF[NOVA_DB_NAME]['server'] = NOVA_MYSQL_SERVER;
-    SELF[NOVA_DB_NAME]['users'][NOVA_DB_USER] = nlist(
-        'password', NOVA_DB_PASSWORD,
+    SELF[OS_NOVA_DB_NAME]['createDb'] = true;
+    SELF[OS_NOVA_DB_NAME]['server'] = NOVA_MYSQL_SERVER;
+    SELF[OS_NOVA_DB_NAME]['users'][OS_NOVA_DB_USERNAME] = nlist(
+        'password', OS_NOVA_DB_PASSWORD,
         'rights', list('ALL PRIVILEGES'),
     );
     SELF;
@@ -39,10 +40,10 @@ include { 'components/mysql/config' };
 variable NOVA_ENDPOINTS ?= '/root/sbin/create-nova-endpoints.sh';
 variable NOVA_ENDPOINTS_CONTENTS ?= file_contents('personality/nova/controller/templates/create-nova-endpoints.templ');
 
-variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_KEYSTONE_PASSWORD',NOVA_KEYSTONE_PASSWORD,NOVA_ENDPOINTS_CONTENTS);
+variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_PASSWORD',OS_NOVA_PASSWORD,NOVA_ENDPOINTS_CONTENTS);
 variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_EMAIL',NOVA_EMAIL,NOVA_ENDPOINTS_CONTENTS);
-variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_PUBLIC_HOST',NOVA_PUBLIC_HOST,NOVA_ENDPOINTS_CONTENTS);
-variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_INTERNAL_HOST',NOVA_INTERNAL_HOST,NOVA_ENDPOINTS_CONTENTS);
+variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_CONTROLLER_HOST',OS_NOVA_CONTROLLER_HOST,NOVA_ENDPOINTS_CONTENTS);
+variable NOVA_ENDPOINTS_CONTENTS = replace('NOVA_MGMT_HOST',OS_NOVA_MGMT_HOST,NOVA_ENDPOINTS_CONTENTS);
 
 "/software/components/filecopy/services" = npush(
     escape(NOVA_ENDPOINTS), nlist(

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Nova user and role creation"
-keystone user-create --name=nova --pass=NOVA_KEYSTONE_PASSWORD --email=NOVA_EMAIL
+keystone user-create --name=nova --pass=NOVA_PASSWORD --email=NOVA_EMAIL
 keystone user-role-add --user=nova --tenant=service --role=admin
 
 echo "Nova Compute service endpoint creation"
@@ -10,6 +10,6 @@ keystone service-create --name=nova --type=compute \
 NOVA_SERVICE_ID=$(keystone service-list | awk -v var="volume" '$0 ~ var { print $2 }')
 keystone endpoint-create \
   --service-id=${NOVA_SERVICE_ID} \
-  --publicurl=http://NOVA_PUBLIC_HOST:8774/v2/%\(tenant_id\)s \
-  --internalurl=http://NOVA_INTERNAL_HOST:8774/v2/%\(tenant_id\)s \
-  --adminurl=http://NOVA_INTERNAL_HOST:8774/v2/%\(tenant_id\)s
+  --publicurl=http://NOVA_CONTROLLER_HOST:8774/v2/%\(tenant_id\)s \
+  --internalurl=http://NOVA_MGMT_HOST:8774/v2/%\(tenant_id\)s \
+  --adminurl=http://NOVA_MGMT_HOST:8774/v2/%\(tenant_id\)s

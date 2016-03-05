@@ -9,7 +9,7 @@ values = any string
 default = icehouse
 required = no
 }
-variable REPOSITORY_OPENSTACK_VARIANT ?= 'icehouse';
+variable REPOSITORY_OPENSTACK_VARIANT ?= 'liberty';
 
 variable REPOSITORY_OPENSTACK_BASE ?= REPOSITORY_OPENSTACK_VARIANT + '_' + OS_VERSION_PARAMS['major'] + '_' + PKG_ARCH_DEFAULT;
 

@@ -1,7 +1,7 @@
 
 unique template personality/keystone/service;
 
-variable KEYSTONE_MYSQL_SERVER ?= FULL_HOSTNAME;
+variable KEYSTONE_MYSQL_SERVER ?= MYSQL_HOST;
 
 # Add RPMs for Keystone
 include { 'personality/keystone/rpms/config' };
@@ -10,11 +10,19 @@ include { 'personality/keystone/rpms/config' };
 include { 'personality/keystone/config' };
 
 # Configure MySQL server
-variable MYSQL_INCLUDE = {
-  if (KEYSTONE_MYSQL_SERVER == FULL_HOSTNAME) {
-    'features/mysql/server';
-  } else {
-    'null';
-  }
-};
-include { MYSQL_INCLUDE };
+include { 'features/mariadb/config' };
+
+# Configure httpd
+include 'features/httpd/config';
+
+# Configure memcache
+include 'features/memcache/config';
+
+# Add accepted CAs certificates
+include { if (OS_CONFIGURE_VOS) 'security/cas' };
+
+# Update the certificate revocation lists.
+include { if (OS_CONFIGURE_VOS) 'features/fetch-crl/config' };
+#include 'defaults/grid/config';
+# Configure VOs
+include { if (OS_CONFIGURE_VOS) 'vo/config' };
